@@ -323,19 +323,39 @@ countDown("2021-9-10 8:00:00");
 
 #### 3.5.3 Array
 
-| 常用API                    | 作用                                                         |
-| -------------------------- | ------------------------------------------------------------ |
-| Array.isArray(obj)         | 判断是否是数组                                               |
-| Array.push()               | 后插                                                         |
-| Array.unshift()            | 头插                                                         |
-| Array.pop()                | 尾删                                                         |
-| Array.shift()              | 头删                                                         |
-| Array.reverse()            | 翻转                                                         |
-| Array.sort()               | 默认按照ASIC排序，Array.sort(function(a,b){<br />      return a-b;<br />})；升序 |
-| Array.indexOf(value)       | 返回value下标，找不到返回0                                   |
-| Array.toString()           | 数组转换为字符串，保留逗号                                   |
-| Array.join(’分隔符‘)       | 数组转换为字符串，传参符分割                                 |
-| Array.splice(index,length) | 从index开始删length个                                        |
+| 常用API                         | 作用                                                         |
+| ------------------------------- | ------------------------------------------------------------ |
+| Array.isArray(obj)              | 判断是否是数组                                               |
+| Array.push()                    | 后插                                                         |
+| Array.unshift()                 | 头插                                                         |
+| Array.pop()                     | 尾删                                                         |
+| Array.shift()                   | 头删                                                         |
+| Array.reverse()                 | 翻转                                                         |
+| Array.sort()                    | 默认按照ASIC排序，Array.sort(function(a,b){<br />      return a-b;<br />})；升序 |
+| Array.indexOf(value)            | 返回value下标，找不到返回0                                   |
+| Array.toString()                | 数组转换为字符串，保留逗号                                   |
+| Array.join(’分隔符‘)            | 数组转换为字符串，传参符分割                                 |
+| Array.splice(index,length)      | 从index开始删length个                                        |
+| Array.from(obj,()=>{})          | 将任何集合类对象转化为数组对象                               |
+| Array.of(,,,,,,,)               | 将所有参数放在同个数组中返回                                 |
+| Array.includes()                | 数组中是否包含                                               |
+| Array.keys()/values()/entries() | 返回迭代器用于遍历                                           |
+
+```js
+let arr = new Array("a", "b", "c");
+console.log(arr);
+for (let index of arr.keys()) {
+  console.log(index);
+}
+for (let val of arr.values()) {
+  console.log(val);
+}
+for (let [key, value] of arr.entries()) {
+  console.log(key, value);
+}
+```
+
+
 
 ---
 
@@ -982,3 +1002,833 @@ var x = $.noConflict();
 console.log(x(".father"));
 ```
 
+---
+
+## 六、ES6
+
+### 6.1 类的创建和使用
+
+#### 6.1.1 类的创建
+
+```js
+class People {
+  constructor(name) {
+    this.name = name;
+  }
+  getName() {
+    return this.name;
+  }
+}
+
+var p1 = new People("小明");
+console.log(p1.getName());
+```
+
+---
+
+#### 6.1.2 类的继承
+
+```js
+class Father {
+  constructor(name) {
+    this.name = name;
+  }
+  getName() {
+    return this.name;
+  }
+  say() {
+    return "我是爸爸";
+  }
+}
+
+class Son extends Father {
+  constructor(name) {
+    super();	//子类如果想使用父类的方法，需要在this之前调用super()
+    this.name = name;
+  }
+  say() {
+    console.log(super.say() + "的儿子");
+  }
+}
+
+var son = new Son("小明");
+console.log(son.getName());
+son.say();
+
+```
+
+---
+
+### 6.2 ES5构造函数原型
+
+​	如果通过构造函数创建对象，如果所有对象有一个完全相同的方法，每次创建一个实例对象时都会new一个新的内存空间存放这个方法，因此在实现此类方法时将此类方法存储到构造函数的内置属性prototype类(构造函数原型)中来共享方法,构造函数prototype属性也即实例对象的\__proto__属性(对象原型,本质也是一个类)
+
+```js
+function People(name) {
+  this.name = name;
+}
+People.prototype.Skill = function () {
+  console.log("我会唱歌");
+};
+
+var p1 = new People("小明");
+var p2 = new People("小红");
+console.log(p1.Skill());
+console.log(p2.Skill());
+console.log(p1.__proto__);
+console.log(People.prototype);
+
+```
+
+![image-20210918132451106](/Users/lunan/Library/Application Support/typora-user-images/image-20210918132451106.png)
+
+---
+
+### 6.3 函数高级方法
+
+#### 	6.3.1 改变函数内部this指向
+
+​		**call：**
+
+```js
+class People {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+var test = function () {
+  console.log(this);
+};
+
+test.call(); //global
+test.call(People);//People
+
+```
+
+---
+
+​		**applay:**
+
+​		第一个参数也为this指向对象，第二个参数必须为数组
+
+```js
+var nums = [66, 12, 24, 40, 100];
+console.log(Math.max.apply(null, nums));
+```
+
+---
+
+​		**bind:**
+
+​		在不调用原来函数的情况下改变原来函数内部的this指向，返回的是一个改变this之后的新函数
+
+```js
+var People = function (name) {
+  this.name = name;
+};
+
+var test = function () {
+  console.log(this);
+};
+
+var People_test = test.bind(People);
+People_test();
+
+```
+
+### 	6.4 闭包
+
+​		闭包指有权访问另一个函数作用域中变量的函数
+
+```js
+var lis = document.querySelectorAll("ul li");
+console.log(lis);
+for (var i = 0; i < lis.length; i++) {
+  console.log(1);
+  (function (i) {
+    lis[i].addEventListener("click", function () {
+      console.log(i);
+    });
+  })(i);
+}
+```
+
+---
+
+### 	6.5 正则表达式
+
+```js
+var reg = /^[^abc]$/;
+console.log(reg.test("1"));
+```
+
+| 符号                                | 描述                                         |
+| ----------------------------------- | -------------------------------------------- |
+| /^abc/                              | 必须以abc开头                                |
+| /abc$/                              | 必须以abc结尾                                |
+| /^abc$/                             | 只能为abc                                    |
+| /abc/                               | 含abc就可                                    |
+| /[abc]/                             | 含a或b或c就可                                |
+| /^[abc]$/                           | 只能为a，b，c中的一个                        |
+| /^[a-z]$/                           | 只能为一个英文字母                           |
+| /^[a-zA-Z0-9]$/                     | 只能为一个英文字母或数字                     |
+| /^\[^a-zA-Z0-9]$/                   | 里面的^为取反的意思，不能为英文和数字        |
+| /^a*$/                              | a可出现0次以上                               |
+| /^a+$/                              | a出现1次以上                                 |
+| /^a?$/                              | a可出现0次或1次                              |
+| /^a{3,10}$/                         | a出现3~10次                                  |
+| /^\[^a-zA-Z0-9]{8,16}$/             | 8-16位的[]内字符                             |
+| /^\[^a-zA-Z0-9]{8,16}$/g or i or gi | g为全局匹配，i忽略大小写，gi全局且忽略大小写 |
+
+ 	1. 中括号内表示字符集合，人已匹配中括号内容中的一个
+ 	2. 大括号里面表示重复次数
+ 	3. 小括号代表优先级
+
+| 预定义类 | 说明                                  |
+| -------- | ------------------------------------- |
+| \d       | [0-9]                                 |
+| \D       | [^0-9]                                |
+| \w       | [A-Za-z0-9_]                          |
+| \W       | [^A-Za-z0-9_]                         |
+| \s       | [\t\r\n\v\f] 匹配换行、制表、空格符等 |
+| \S       | [^\t\r\n\v\f]                         |
+
+```js
+// 全国座机号格式 010-12345678 或 0530-1234567
+var reg = /\d{3,4}-\d{7,8}/;
+console.log(reg.test("010-1234567"));
+```
+
+```js
+var str = "!imba667788!";
+var reg = /\w/g;
+var new_str = str.replace(reg, "*");
+console.log(new_str);
+console.log(str);
+```
+
+---
+
+### 6.6 const、let和var
+
+​	**let：**
+
+​		1.不会变量提升，只能先声明再使用
+
+​		2.let声明只能再块级作用域中使用
+
+​		3.let声明的变量不能重复声明
+
+​	**const:**
+
+​		1.不会变量提升，只能先声明再使用
+
+​		2.let声明只能再块级作用域中使用
+
+​		3.let声明的变量不能重复声明
+
+​		4.一旦被声明，无法被修改
+
+​		5.可以声明对象，且能修改对象中的属性		
+
+---
+
+### 6.7 模板字符串
+
+```js
+const test = document.querySelector(".other");
+let html_str = (test.innerHTML = `<ul>
+<li id=${"sb"}>${"大帅逼"}</li>
+</ul>`);
+
+test.innerHTML = html_str;
+```
+
+---
+
+### 6.8 函数剩余参数
+
+```js
+let book = {
+  name: "十万个为什么",
+  athor: "不知道",
+  price: 20,
+};
+
+function getData(obj, ...keys) {
+  let result = {};
+  for (let i = 0; i < keys.length; i++) {
+    result[keys[i]] = obj[keys[i]];
+  }
+  return result;
+}
+
+console.log(getData(book, "name", "athor", "price"));
+```
+
+---
+
+### 6.9 箭头函数
+
+​	()=>{} 等价于function(){}，函数内容只有一行时可以不加{}
+
+​	箭头函数没有内部this指向，此时箭头函数内部的this会根据链式查找其所指明的this对象
+
+​	箭头函数不能用new来实例化对象
+
+```js
+let add = (a, b) => a + b;
+console.log(add(10, 20));
+```
+
+---
+
+### 6.10 解构赋值
+
+```js
+let Students = {
+  s1: {
+    name: "张三",
+    age: 14,
+  },
+  s2: {
+    name: "李四",
+    age: 15,
+  },
+  s3: {
+    name: "王五",
+    age: 16,
+  },
+};
+
+const { s1, ...others } = Students;
+console.log(others);
+```
+
+---
+
+### 6.11 Symbol变量（xxx搞不懂）
+
+​	原始数据类型Symbol，它表示是独一无二的变量
+
+​	最大的用途：用来定义对象的私有变量
+
+---
+
+### 6.12 Set(集合)
+
+​	无重复值的有序列表
+
+| 方法      | 描述       |
+| --------- | ---------- |
+| .add()    | 添加元素   |
+| .delete() | 删除元素   |
+| .has()    | 是否含元素 |
+| .size     | 长度       |
+
+```js
+var myset = new Set([1, 2, 2, 3, 3, 3, 5]);
+console.log(myset);
+var arr = Array.from(myset);
+console.log(arr);
+```
+
+---
+
+### 6.13 Map
+
+​	键值对的有序列表，键和值是任意类型
+
+| 方法            | 描述               |
+| --------------- | ------------------ |
+| .set(key,value) | 添加键值对         |
+| .get(key)       | 得到对应key的value |
+| .has(key)       | 是否存在键值对     |
+| .delete('key')  | 删除对应键值对     |
+| .clear          | 清空map            |
+
+---
+
+### 6.14 Promise对象(先这样，后面再加)
+
+​	**回调地狱：**
+
+​		代码耦合性高，牵一发而动全身，难以维护
+
+​		大量冗余代码相互嵌套，可读性差
+
+```js
+setTimeout(function () {
+  console.log("我是第一层");
+  setTimeout(function () {
+    console.log("我是第二层");
+    setTimeout(function () {
+      console.log("我是第三层");
+    }, 3000);
+  }, 2000);
+}, 1000);
+
+```
+
+---
+
+​	**promise:**
+
+​		1.Promise是个构造函数，new出来的是一个实例对象，代表一个异步操作
+
+​		2.then()方法用来预先指定成功和失败的回调函数
+
+​				p.then(success=>(), error=>())
+
+```js
+let random_Promise = function () {
+  let p = new Promise(function (resolve, reject) {
+    setTimeout(() => {
+      var num = Math.ceil(Math.random() * 10);
+      if (num > 5) {
+        resolve(num);
+      } else {
+        rejecte(num + "不够大");
+      }
+    }, 2000);
+  });
+  return p;
+};
+
+random_Promise().then(
+  (data) => console.log("成功接收到data:", data),
+  (reason) => console.log("接受失败" + reason)
+);
+```
+
+---
+
+​	**promise异步读取文件:**
+
+```js
+//npm install then-fs本地安装包
+import thenFs from "then-fs";
+// then-fs的readFile()返回一个Promise对象，因此可以调用then方法
+
+thenFs.readFile("./test1.txt", "utf8").then((r1) => {
+  console.log(r1);
+  return thenFs.readFile("./test2.txt", "utf8").then((r2) => {
+    console.log(r2);
+    return thenFs.readFile("./test3.txt", "utf8").then((r3) => {
+      console.log(r3);
+    });
+  });
+});
+--------------------------------------------------------------------
+//如果将.catch()放在中间，则不会影响后续的执行步骤，若将.catch放在最后，则捕获所有err，出现一个err就终止
+.readFile("./testx.txt", "utf8")
+  .catch((err) => {
+    console.log(err.message);
+  })
+  .then((r1) => {
+    console.log(r1);
+    return thenFs.readFile("./test2.txt", "utf8").then((r2) => {
+      console.log(r2);
+      return thenFs.readFile("./test3.txt", "utf8").then((r3) => {
+        console.log(r3);
+      });
+    });
+  });
+```
+
+---
+
+​	**all()和race():**
+
+```js
+import thenFs from "then-fs";
+// then-fs的readFile()返回一个Promise对象，因此可以调用then方法
+
+let promiseArr = [
+  thenFs.readFile("./test1.txt", "utf8"),
+  thenFs.readFile("./test2.txt", "utf8"),
+  thenFs.readFile("./test3.txt", "utf8"),
+];
+
+//等待所有的promise异步操作执行完后进行then操作
+Promise.all(promiseArr).then((result) => {
+  console.log(result);
+});
+
+//只要任何一个异步操作完成，就执行下一步的then操作
+Promise.race(promiseArr).then((result) => {
+  console.log(result);
+});
+
+先输出111，再输出[111,222,333]
+```
+
+---
+
+### 6.15 ES6 模块化
+
+​	在当前目录下的终端中输入nmp init -y 生成package.json文件，在最上面添加"type":"module",
+
+#### 	6.15.1 默认导入导出
+
+​		默认导入导出只能在文件执行一次
+
+​		默认导出的名称可以任意
+
+```js
+class People {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+}
+let p1 = new People("小明", 14);
+export default {
+  p1,
+  People,
+};
+----------------
+
+import sth from "./test.js";
+console.log(sth.p1);
+```
+
+---
+
+#### 	6.15.2 按需导出
+
+​		1.每个模块中可以使用多次按需导出
+
+​		2.按需导入的成员名称必须和按需导出的名称一致
+
+​		3.导入时可以用as重命名
+
+​		4.按需导入可以和默认导入一起使用
+
+```js
+class People {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+}
+
+export let p1 = new People("小明", 14);
+export let add = (a, b) => a + b;
+----------------------------------------------
+import { p1, add } from "./test.js";
+console.log(p1);
+console.log(add(1, 2));
+
+```
+
+---
+
+#### 	6.15.3 直接导入并执行模块中的代码
+
+```js
+let add = (a, b) => a + b;
+console.log(add(1, 2));
+--------------------------------
+import "./test.js";
+```
+
+---
+
+### 6.16 async和await
+
+​	1.如果在function中使用了await，则function必须被async修饰
+
+​	2.在async方法中，第一个await之前的代码都同步执行，await之后的代码会加入异步队列，因此先会执行console.log("C")
+
+```js
+import thenFs from "then-fs";
+// then-fs的readFile()返回一个Promise对象，因此可以调用then方法
+
+console.log("A");
+async function getAllFile() {
+  console.log("B");
+  const r1 = await thenFs.readFile("./test1.txt", "utf8");
+  const r2 = await thenFs.readFile("./test2.txt", "utf8");
+  const r3 = await thenFs.readFile("./test3.txt", "utf8");
+  console.log(r1, r2, r3);
+  console.log("D");
+}
+
+getAllFile();
+console.log("C");
+```
+
+---
+
+### 6.17 EventLoop
+
+​	JavaScript是单线程语言，为了防止某个耗时任务导致程序假死，js把待执行任务分为了两类：
+
+​		**同步任务：**
+
+​			非耗时任务，指的是在主线程上排队执行的那些任务
+
+​			只有前一个任务执行完毕，才能执行后一个任务
+
+​		**异步任务：**
+
+​			耗时任务，异步任务由js委托给宿主环境进行执行
+
+​			当异步任务执行完成后，会通知js主线程执行异步任务的回调函数
+
+---
+
+### 6.18 宏任务和微任务
+
+​	Js把异步任务又分为宏任务和微任务
+
+​		**宏任务:**
+
+​			异步ajax请求
+
+​			setTimeout、setInterval
+
+​			文件操作
+
+​			其他宏任务
+
+​	**微任务：**
+
+​			Promise.then .catch .finally
+
+​			Process.nextTick
+
+​			其他微任务
+
+![image-20210926154322399](/Users/lunan/Library/Application Support/typora-user-images/image-20210926154322399.png)
+
+---
+
+## 七、WebPack
+
+### 	7.1 手动配置WebPack
+
+​		1.在工作目录终端输入npm init -y生成package.json
+
+​		2.新建src文件，在内新建index.html和index.js
+
+​		3.装jquery，npm install jquery -S，import $ from "jquery"
+
+​		4.npm install webpack -D，npm install webpack-cli -D
+
+​		5.新建webpack-config.js文件，添加：
+
+​				module.export = {
+
+​					mode:"development" or "production"
+
+​				}
+
+​		6.修改package.json中的script:{}中的内容，改为"dev":"webpack",dev为任意名
+
+​		7.运行 npm run dev或者自己取得其他名，生成disc文件以及内部的main.js
+
+​		8.在html文件中引入main.js
+
+```js
+entry: path.join(__dirname, "./src/index.js"), //修改src中.js文件名，否则不是index.js就会报错
+  output: {
+    path: path.join(__dirname, "./dist"), //打包后生成dist文件,可改名
+    filename: "js/main.js", //改名生成.js文件,存放在dist下的js文件夹中
+  },
+```
+
+
+
+---
+
+### 7.2 安装Webpack插件
+
+​		**web-dev-server脚本安装与使用:**
+
+​			1.npm install web-dev-server@3.11.2 -D
+
+​			2.在package.json文件中script添加dev: "webpack serve"
+
+​			3.index.html引入	/main.js
+
+​			3.npm run dev，打开localhost:8080，点击src自动进入index.html，ctrl+s保存自动显示
+
+​			4.想要运行后直接打开，在module.exports中添加：
+
+```js
+devServer: {
+    open: true,
+    // port:80,如果端口号是80，直接localhost就可打开
+    // host: "127.0.0.1",打开路径
+  },
+```
+
+---
+
+​		**html-webpack-plugin插件安装与使用（localhost:8080/直接打开index.html）:**
+
+​			1.pm install html-webpack-plugin@5.3.2 -D
+
+​			2.webpack.config.js文件中添加
+
+```js
+const HtmlPlugin = require("html-webpack-plugin");
+
+const htmlPlugin = new HtmlPlugin({
+  template: "./src/index.html",	//拷贝文件目录
+  filename: "./index.html",	//将文件拷贝目录
+});
+
+module.exports = {
+  mode: "development",
+  plugins: [htmlPlugin],//HtmlPlugin脚本数组
+};
+
+```
+
+​	**每次保存dev-server自动覆盖原来的dist文件：**
+
+​		npm install --save-dev clean-webpack-plugin
+
+```js
+const { CleanWEbpackPlugin } = require("clean-webpack-plugin
+                                       
+plugins: [htmlPlugin, new CleanWEbpackPlugin()],
+```
+
+---
+
+### 7.2 WebPack中的loader加载器
+
+​	Webpack只能处理.js模块的文件，.css、.less则需要调用loader处理
+
+​	**配置loader加载css文件：**
+
+​		需要在index.js中导入 import 'css文件路径名'
+
+​		npm i style-loader@3.0.0 css-loader@5.2.6 -D
+
+​		webpack.config.js文件配置
+
+```js
+module: {
+    rules: [
+      //定义了不同模块对应的loader
+      { test: /\.css$/, use: ["style-loader", "css-loader"] },
+    ],
+  },
+```
+
+​	**配置loader加载less文件**
+
+​		导入.less文件
+
+​		npm i less-loader@10.0.1 less@4.1.1 -D
+
+​		webpack.config.js文件配置		
+
+```js
+module: {
+    rules: [
+      //定义了不同模块对应的loader
+      { test: /\.css$/, use: ["style-loader", "css-loader"] },
+      { test: /\.less$/, use: ["style-loader", "css-loader", "less-loader"] },
+    ],
+  },
+```
+
+​	**配置loader加载图片**
+
+​		导入图片文件 import 自定义名 from 图片路径	(自定义名代表64位字符串)
+
+​		npm i url-loader@4.1.1 file-loader@6.2.0 -D
+
+```js
+module: {
+    rules: [
+      //定义了不同模块对应的loader
+      { test: /\.css$/, use: ["style-loader", "css-loader"] },
+      { test: /\.less$/, use: ["style-loader", "css-loader", "less-loader"] },
+      {
+        test: /\.jpg|png|gif$/,
+        use: "url-loader?limit=22229&outputPath=images",
+      },//只有图片大小<22229B才会转化为64base,打包后的存放路径为dist下的image文件夹中
+    ],
+  },
+```
+
+​	**配置loader加载Js高级语法（还没学先不用）**
+
+---
+
+### 7.3 项目打包发布
+
+​	在webpack.config.js文件下的scripts模块下添加"build":"webpack --mode production"
+
+​	webpack.config.js的所有配置:
+
+```js
+const path = require("path"); //导入修改打包路径的模块
+
+const HtmlPlugin = require("html-webpack-plugin");
+
+const htmlPlugin = new HtmlPlugin({
+  template: "./src/index.html",
+  filename: "./index.html",
+});
+
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+
+module.exports = {
+  //development or production
+  mode: "development",
+	
+  devtool: "eval-source-map",//配置SourceMap
+  
+  //打包入口出口配合第一个const使用
+  entry: path.join(__dirname, "./src/index.js"), //修改src中.js文件名，否则不是index.js就会报错
+  output: {
+    path: path.join(__dirname, "./dist"), //打包后生成dist文件,可改名
+    filename: "js/main.js", //改名生成.js文件
+  },
+
+  //plugin插件配合后面三个个const使用
+  plugins: [htmlPlugin, new CleanWebpackPlugin()],
+
+  //webpack-dev-server插件的配置
+  devServer: {
+    open: true,
+    // port:80,如果端口号是80，直接localhost就可打开
+    // host: "127.0.0.1",打开路径
+  },
+
+  //不同的loader
+  module: {
+    rules: [
+      //定义了不同模块对应的loader
+      { test: /\.css$/, use: ["style-loader", "css-loader"] },
+      { test: /\.less$/, use: ["style-loader", "css-loader", "less-loader"] },
+      {
+        test: /\.jpg|png|gif$/,
+        use: "url-loader?limit=22229&outputPath=images",
+      },
+    ],
+  },
+};
+
+```
+
+---
+
+### 7.4 SourceMap
+
+​	如果.js文件中有语法错误或其他错误，浏览器中会显示出错的文件与行号，但是行号是打包后.js文件的行号，不对应，因此需要配置SourceMap
+
+​	webpack.config.js文件中配置
+
+​			devtool: "eval-source-map",
+
+注：配置后，有错修正后ctrl+s保存不会自动刷新，且项目打包发布时简易关闭devtool
